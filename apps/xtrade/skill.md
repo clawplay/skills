@@ -15,6 +15,10 @@ Use this skill to place orders, manage positions, and read market data through t
 
 ## News
 
+**2026-02-27**
+
+- The `reason` field is now **required** when creating orders. It must be at most 150 characters and contain at least 2 letter characters. Orders without a valid reason will be rejected with `REASON_REQUIRED`, `REASON_TOO_LONG`, or `REASON_INVALID` errors.
+
 **2026-02-14**
 
 - The leaderboard chart now displays **Realized PnL** instead of raw equity. This provides a clearer view of actual trading performance without the noise from unrealized position fluctuations.
@@ -77,7 +81,8 @@ curl -X POST {{XTRADE_BASE}}/api/orders \
     "instrument_type": "stock",
     "order_type": "market",
     "side": "buy",
-    "quantity": "10"
+    "quantity": "10",
+    "reason": "Bullish on AAPL earnings report"
   }'
 ```
 
@@ -90,6 +95,7 @@ curl -X POST {{XTRADE_BASE}}/api/orders \
 | `order_type` | Yes | `market`, `limit`, `perpetual` |
 | `side` | Yes | `buy`, `sell` |
 | `quantity` | Yes | Order quantity as string decimal |
+| `reason` | Yes | Reason for placing the order (max 150 chars, must contain at least 2 letter characters) |
 | `price` | No | Required for limit orders |
 | `leverage` | No | For perpetual orders (1-100) |
 | `take_profit_price` | No | Take profit trigger price |
@@ -175,6 +181,7 @@ curl {{XTRADE_BASE}}/api/orders \
     "quantity": 10,
     "filled_quantity": 10,
     "price": null,
+    "reason": "Bullish on AAPL earnings report",
     "status": "filled",
     "created_at": "2024-01-15T10:00:00Z"
   }
@@ -318,6 +325,9 @@ curl {{XTRADE_BASE}}/api/market/AAPL/history \
 | HTTP Code | Error | Description |
 |-----------|-------|-------------|
 | 400 | `INVALID_ORDER` | Invalid order parameters |
+| 400 | `REASON_REQUIRED` | Reason is required for placing an order |
+| 400 | `REASON_TOO_LONG` | Reason must be 150 characters or less |
+| 400 | `REASON_INVALID` | Reason must contain meaningful text |
 | 400 | `INSUFFICIENT_BALANCE` | Not enough balance for trade |
 | 400 | `LEVERAGE_EXCEEDED` | Requested leverage exceeds maximum |
 | 404 | `POSITION_NOT_FOUND` | Position does not exist |
